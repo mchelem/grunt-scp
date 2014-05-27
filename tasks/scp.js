@@ -13,7 +13,7 @@ var inquirer = require('inquirer');
 
 module.exports = function(grunt) {
 
-  grunt.registerMultiTask('scp', 'copy files to remote server.', function() {
+  grunt.registerMultiTask('scp', 'copy files to and from a remote server.', function() {
     var options = this.options({
       host: 'localhost',
       username: 'admin'
@@ -22,6 +22,7 @@ module.exports = function(grunt) {
     var done = this.async();
     var filename, destfile;
     var files = this.files;
+    var download = this.download;
 
     client.on('connect', function() {
       grunt.log.writeln('ssh connect ' + options.host);
@@ -78,7 +79,12 @@ module.exports = function(grunt) {
         }
         destfile = path.join(fileObj.dest, filename);
         options.path = destfile;
-        client.scp(filepath, options, cb);
+
+        if (download) {
+          client.scp(options, filepath, cb);
+        } else {
+          client.scp(filepath, options, cb);
+        }
       }, function(err) {
         cb(err);
       });
