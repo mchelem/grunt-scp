@@ -8,7 +8,7 @@
 
 var path = require('path');
 var async = require('async');
-var Client = require('scp2').Client;
+var client = require('scp2')
 var inquirer = require('inquirer');
 
 module.exports = function(grunt) {
@@ -21,7 +21,6 @@ module.exports = function(grunt) {
 
     var done = this.async();
     var filename, destfile;
-    var client = new Client(options);
     var files = this.files;
 
     client.on('connect', function() {
@@ -58,9 +57,9 @@ module.exports = function(grunt) {
       return false;
     });
 
-    function execUploads() {
+    function execSecureCopy() {
       async.eachSeries(files, function(fileObj, cb) {
-        upload(fileObj, cb);
+        copy(fileObj, cb);
       }, function(err) {
         if (err) {
           grunt.log.error('Error ' + err);
@@ -69,7 +68,7 @@ module.exports = function(grunt) {
       });
     }
 
-    function upload(fileObj, cb) {
+    function copy(fileObj, cb) {
       async.eachSeries(fileObj.src, function(filepath, cb) {
         if (fileObj.cwd) {
           filename = filepath;
@@ -78,7 +77,8 @@ module.exports = function(grunt) {
           filename = path.relative(fileObj.orig.cwd, filepath);
         }
         destfile = path.join(fileObj.dest, filename);
-        client.upload(filepath, destfile, cb);
+        options.path = destfile;
+        client.scp(filepath, options, cb);
       }, function(err) {
         cb(err);
       });
@@ -92,11 +92,11 @@ module.exports = function(grunt) {
       }], function(answers) {
         options.password = answers.password;
         client.defaults(options);
-        execUploads();
+        execSecureCopy();
       });
     }
     else {
-      execUploads();  
+      execSecureCopy();
     }
   });
 };
