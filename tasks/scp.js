@@ -22,7 +22,7 @@ module.exports = function(grunt) {
     var done = this.async();
     var filename, destfile;
     var files = this.files;
-    var download = this.download;
+    var download = options.download;
 
     client.on('connect', function() {
       grunt.log.writeln('ssh connect ' + options.host);
