@@ -78,11 +78,12 @@ module.exports = function(grunt) {
           filename = path.relative(fileObj.orig.cwd, filepath);
         }
         destfile = path.join(fileObj.dest, filename);
-        options.path = destfile;
 
         if (download) {
-          client.scp(options, filepath, cb);
+          options.path = filepath;
+          client.scp(options, destfile, cb);
         } else {
+          options.path = destfile;
           client.scp(filepath, options, cb);
         }
       }, function(err) {
